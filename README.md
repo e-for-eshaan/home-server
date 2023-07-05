@@ -76,7 +76,6 @@ If you want to explore more advanced server configurations and applications, the
 
 Happy server building and happy exploring!
 
-cat << EOF > README.md
 # Deploying a Static React Website with Apache2
 
 ![apache2-react](https://example.com/apache2-react-image.png)
