@@ -1,35 +1,16 @@
-# Building a Home Server with Ubuntu and SSH
-
-![home-server](https://example.com/home-server-image.png)
-<br/>
-###### *Fig 1. A visual representation of a home server setup.*
+# Building My Home Server with Ubuntu and SSH
 
 ## Introduction
 
-This blog post will guide you through the process of setting up a home server using your old laptop and Ubuntu operating system. We will use SSH (Secure Shell) for remote access to the server. By following this guide, you'll be able to create your own personal server that can be used for various purposes, such as hosting websites, file storage, media streaming, and more.
+I wanted to repurpose my old laptop and turn it into a home server that I could use for various purposes such as hosting websites, storing files, and streaming media. After doing some research, I decided to use Ubuntu as my operating system and SSH (Secure Shell) for remote access to the server. In this document, I will share my experience of building my own home server using Ubuntu and SSH.
 
-## Prerequisites
+## Why Ubuntu and SSH?
 
-Before getting started, make sure you have the following:
+I chose Ubuntu because of its reliability, ease of use, and wide community support. Ubuntu is a popular Linux distribution that provides a stable and secure environment for server applications. It also has a user-friendly interface, which made it easier for me to set up and manage my server.
 
-- An old laptop or computer that you want to repurpose as a home server.
-- Ubuntu operating system installed on your laptop. You can download the latest version of Ubuntu from the official website and install it following the instructions provided.
-- Basic knowledge of the Linux command line.
+For remote access, I opted for SSH. SSH allows me to securely connect to my server from any location and perform various tasks remotely. It provides encrypted communication, ensuring that my data and login credentials are protected from unauthorized access.
 
-## Setting up SSH Server
-
-## Setting Up a Static IP for Ubuntu Desktop
-
-In a typical network setup, devices are assigned dynamic IP addresses by a DHCP server. This dynamic IP assignment works well for most situations. However, there are cases where having a static IP address for your Ubuntu Desktop can be beneficial.
-
-A static IP address is a fixed IP that you manually assign to your computer instead of relying on automatic assignment. Here's how you can set up a static IP for your Ubuntu Desktop:
-
-1. Open a terminal on your Ubuntu Desktop.
-
-2. Edit the network configuration file using the following command:
-   ```bash
-   sudo nano /etc/netplan/01-netcfg.yaml
-   ```
+## Setting Up Ubuntu and SSH
 
 SSH allows secure remote access to your server. To set up SSH on your Ubuntu home server, follow these steps:
 
@@ -46,16 +27,16 @@ SSH allows secure remote access to your server. To set up SSH on your Ubuntu hom
    ```
 
 4. Once the installation is complete, the SSH service will start automatically. You can verify the status of the SSH service by running the following command:
-   ```
+     ```
    sudo systemctl status ssh
-   ```
+     ```
 
    If the service is active and running, you should see a message indicating that the SSH service is active.
 
 5. By default, SSH runs on port 22. If you want to change the default port for added security, you can edit the SSH configuration file by running the following command:
-   ```
+     ```
    sudo nano /etc/ssh/sshd_config
-   ```
+     ```
 
    Locate the line that specifies the port (usually \`#Port 22\`) and remove the \`#\` symbol. Change the port number to your desired value, save the file, and exit the editor.
 
@@ -78,78 +59,83 @@ Happy server building and happy exploring!
 
 # Deploying a Static React Website with Apache2
 
-![apache2-react](https://example.com/apache2-react-image.png)
-<br/>
-###### *Fig 1. Illustration of deploying a static React website with Apache2.*
-
-## Introduction
-
-This blog post will guide you through the process of setting up Apache2 and deploying a static React website on your server. By following this guide, you'll be able to serve your React website to visitors using the Apache web server, enabling you to showcase your website to the world.
+In this section, I will walk you through my experience of setting up Apache2 and deploying a static React website on my server. The goal was to serve my React website to visitors using the Apache web server and showcase my website to the world.
 
 ## Prerequisites
 
-Before getting started, make sure you have the following:
+Before getting started, I made sure to have the following:
 
 - A server running Ubuntu with Apache2 already installed. If you haven't set up Apache2 yet, you can refer to the previous section for instructions on how to install it.
-- A static React website that you want to deploy. If you haven't built your React website yet, you can follow the official React documentation to create a new project and build your website.
+- A static React website that I wanted to deploy. If you haven't built your React website yet, you can follow the official React documentation to create a new project and build your website.
 
 ## Deploying a Static React Website with Apache2
 
-To deploy your static React website using Apache2, follow these steps:
+To deploy my static React website using Apache2, I followed these steps:
 
-1. Build your React website by navigating to the root directory of your React project and running the following command:
-   ```
-   npm run build
-   ```
-   This command will create an optimized production build of your React website in the \`build\` directory.
+1. I built my React website by navigating to the root directory of my React project and running the following command:
 
-2. Copy the contents of the build directory to the default Apache document root directory by running the following command:
-   ```
-   sudo cp -r build/* /var/www/html/
-   ```
-   This command copies all the files and directories from the build directory to the default document root directory of Apache2.
+```
+npm run build
+```
 
-3. Configure Apache2 to serve your React website by creating a virtual host file. Run the following command to create a new virtual host file:
-   ```
-   sudo nano /etc/apache2/sites-available/your-website.conf
-   ```
-   Replace \`your-website.conf\` with a suitable name for your virtual host configuration file.
+This command created an optimized production build of my React website in the \`build\` directory.
 
-4. In the virtual host file, add the following configuration:
-   ```
-   <VirtualHost *:80>
-       ServerName your-domain.com
-       DocumentRoot /var/www/html
-   </VirtualHost>
-   ```
-   Replace \`your-domain.com\` with your actual domain name or server IP address.
+2. Next, I copied the contents of the build directory to the default Apache document root directory by running the following command:
 
-5. Save the virtual host file and exit the editor.
+```
+sudo cp -r build/* /var/www/html/
+```
 
-6. Enable the new virtual host configuration by running the following command:
-   ```
-   sudo a2ensite your-website.conf
-   ```
+This command copied all the files and directories from the build directory to the default document root directory of Apache2.
 
-7. Restart Apache2 for the changes to take effect:
-   ```
-   sudo systemctl restart apache2
-   ```
+3. I configured Apache2 to serve my React website by creating a virtual host file. To create a new virtual host file, I ran the following command:
 
-8. Your React website should now be accessible through the domain name or IP address you specified in the virtual host configuration.
+```
+sudo nano /etc/apache2/sites-available/your-website.conf
+```
+
+Note: I replaced \`your-website.conf\` with a suitable name for my virtual host configuration file.
+
+4. In the virtual host file, I added the following configuration:
+
+
+```
+<VirtualHost *:80>
+ServerName your-domain.com
+DocumentRoot /var/www/html
+</VirtualHost>
+```
+
+I replaced \`your-domain.com\` with my actual domain name or server IP address.
+
+5. I saved the virtual host file and exited the editor.
+
+6. To enable the new virtual host configuration, I ran the following command:
+
+```
+sudo a2ensite your-website.conf
+```
+
+7. Finally, I restarted Apache2 for the changes to take effect:
+```
+sudo systemctl restart apache2
+```
+
+8. Now, my React website was accessible through the domain name or IP address I specified in the virtual host configuration.
 
 ## Conclusion
 
-Congratulations! You have successfully set up Apache2 and deployed your static React website on your server. By following the steps outlined in this guide, you can showcase your React projects to visitors using a reliable and widely-used web server.
+I successfully set up Apache2 and deployed my static React website on my server. By following the steps outlined in this guide, I was able to showcase my React projects to visitors using a reliable and widely-used web server like Apache2.
 
-Remember to keep your server and website secure by configuring appropriate permissions, SSL certificates, and other security measures. Additionally, stay up to date with Apache2 and React updates to ensure compatibility and take advantage of new features.
+To ensure the security of my server and website, I configured appropriate permissions, SSL certificates, and other security measures. Additionally, I made sure to stay up to date with Apache2 and React updates to ensure compatibility and take advantage of new features.
 
-Now you can share your website with the world and continue exploring the possibilities of web development with React and Apache2.
+Overall, I am thrilled to share my website with the world and continue exploring the possibilities of web development with React and Apache2.
 
 ## References
 
-Here are some resources for further reading:
+Here are some resources I found helpful during my journey:
 
 - [Apache HTTP Server Documentation](https://httpd.apache.org/docs/) - Official documentation for Apache HTTP Server.
 - [Ubuntu Official Website](https://ubuntu.com/) - Official website of Ubuntu, where you can download the latest version and find documentation.
 - [OpenSSH Documentation](https
+EOF
