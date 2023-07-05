@@ -45,21 +45,19 @@ SSH allows secure remote access to your server. To set up SSH on your Ubuntu hom
    sudo systemctl restart ssh
    ```
 
+![image](https://github.com/e-for-eshaan/home-server/assets/76566992/3bbcad2c-8b68-4f72-9f83-c1e526939d37)
+
+
 7. Your home server is now set up with SSH. You can access it remotely using an SSH client by connecting to the IP address of your server and the port number you specified (default is 22).
 
-## Conclusion
+![image](https://github.com/e-for-eshaan/home-server/assets/76566992/e9ca407a-f677-41bc-aa69-4b0f01104afd)
 
-Congratulations! You have successfully set up a home server using your old laptop and Ubuntu. With SSH enabled, you can now securely access your server remotely and perform various tasks. This opens up a world of possibilities for hosting websites, storing files, running applications, and more, all within the comfort of your own home.
-
-Remember to keep your server's security in mind by using strong passwords, configuring firewall settings, and keeping your system up to date with security patches.
-
-If you want to explore more advanced server configurations and applications, there are numerous resources available online to help you dive deeper into the world of home servers and Linux administration.
-
-Happy server building and happy exploring!
 
 # Deploying a Static React Website with Apache2
 
 In this section, I will walk you through my experience of setting up Apache2 and deploying a static React website on my server. The goal was to serve my React website to visitors using the Apache web server and showcase my website to the world.
+
+![image](https://github.com/e-for-eshaan/home-server/assets/76566992/65f8cd42-54b4-4e88-b880-2983fe0459ff)
 
 ## Prerequisites
 
