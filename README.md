@@ -1,139 +1,142 @@
-# Building My Home Server with Ubuntu and SSH
+# Home Server
 
-## Introduction
+An old Lenovo laptop, reborn as an always-on home server. It runs Ubuntu Server, lives on the shelf with the lid closed, and does three jobs: it is reachable from anywhere over SSH, it serves my website over Apache, and it acts as network-attached storage for every device in the house.
 
-I wanted to repurpose my old laptop and turn it into a home server that I could use for various purposes such as hosting websites, storing files, and streaming media. After doing some research, I decided to use Ubuntu as my operating system and SSH (Secure Shell) for remote access to the server. In this document, I will share my experience of building my own home server using Ubuntu and SSH.
+![hostnamectl on the server: Ubuntu 22.04.2 LTS on a Lenovo laptop](https://github.com/e-for-eshaan/home-server/assets/76566992/3bbcad2c-8b68-4f72-9f83-c1e526939d37)
 
-## Why Ubuntu and SSH?
+## What it does
 
-I chose Ubuntu because of its reliability, ease of use, and wide community support. Ubuntu is a popular Linux distribution that provides a stable and secure environment for server applications. It also has a user-friendly interface, which made it easier for me to set up and manage my server.
+- **Remote shell.** OpenSSH on a non-default port, so I can administer it from a phone or any laptop without being in the same room.
+- **Web hosting.** Apache serves the production build of a React site straight from the box, so a project can go live without paying for hosting.
+- **Network storage.** Samba shares a folder to every machine on the LAN. It shows up as a normal network drive on Windows, macOS and Linux, which makes it the house's shared disk for files and media.
+- **Costs nothing.** The hardware was already here. A laptop has a built-in battery, a built-in display for emergencies, and idles at a few watts.
 
-For remote access, I opted for SSH. SSH allows me to securely connect to my server from any location and perform various tasks remotely. It provides encrypted communication, ensuring that my data and login credentials are protected from unauthorized access.
+## Why Ubuntu and SSH
 
-## Setting Up Ubuntu and SSH
+Ubuntu Server is stable, well documented and has a package for everything I wanted to run. SSH gives an encrypted shell from anywhere, so nothing on the box ever needs a keyboard and monitor plugged in after the first boot.
 
-SSH allows secure remote access to your server. To set up SSH on your Ubuntu home server, follow these steps:
+## Part 1: Ubuntu and SSH
 
-1. Open a terminal on your Ubuntu machine.
+With Ubuntu installed, the first service to bring up is SSH.
 
-2. Update the package lists on your system by running the following command:
+1. Update the package index.
+
    ```
    sudo apt update
    ```
 
-3. Install the OpenSSH server package by running the following command:
+2. Install the OpenSSH server. The service starts on install.
+
    ```
    sudo apt install openssh-server
+   sudo systemctl status ssh
    ```
 
-4. Once the installation is complete, the SSH service will start automatically. You can verify the status of the SSH service by running the following command:
-     ```
-   sudo systemctl status ssh
-     ```
+3. Move SSH off the default port. Open the config, find the `#Port 22` line, uncomment it and pick a new port.
 
-   If the service is active and running, you should see a message indicating that the SSH service is active.
-
-5. By default, SSH runs on port 22. If you want to change the default port for added security, you can edit the SSH configuration file by running the following command:
-     ```
+   ```
    sudo nano /etc/ssh/sshd_config
-     ```
+   ```
 
-   Locate the line that specifies the port (usually \`#Port 22\`) and remove the \`#\` symbol. Change the port number to your desired value, save the file, and exit the editor.
+4. Restart the service so the change takes effect.
 
-6. If you made any changes to the SSH configuration file, you need to restart the SSH service for the changes to take effect. Run the following command to restart the SSH service:
    ```
    sudo systemctl restart ssh
    ```
 
-![image](https://github.com/e-for-eshaan/home-server/assets/76566992/3bbcad2c-8b68-4f72-9f83-c1e526939d37)
+5. Connect from any other machine with `ssh user@<server-ip> -p <port>`. For access from outside the house, forward that port on the router to the server.
 
+## Part 2: Hosting a React site with Apache
 
-7. Your home server is now set up with SSH. You can access it remotely using an SSH client by connecting to the IP address of your server and the port number you specified (default is 22).
+The goal here was to put a static React build on the internet from the server itself.
 
-![image](https://github.com/e-for-eshaan/home-server/assets/76566992/e9ca407a-f677-41bc-aa69-4b0f01104afd)
+![Apache running on the server](https://github.com/e-for-eshaan/home-server/assets/76566992/65f8cd42-54b4-4e88-b880-2983fe0459ff)
 
+1. Install Apache.
 
-# Deploying a Static React Website with Apache2
+   ```
+   sudo apt install apache2
+   ```
 
-In this section, I will walk you through my experience of setting up Apache2 and deploying a static React website on my server. The goal was to serve my React website to visitors using the Apache web server and showcase my website to the world.
+2. Build the React project on your machine. This produces an optimised `build` directory.
 
-![image](https://github.com/e-for-eshaan/home-server/assets/76566992/65f8cd42-54b4-4e88-b880-2983fe0459ff)
+   ```
+   npm run build
+   ```
 
-## Prerequisites
+3. Copy the build into Apache's document root.
 
-Before getting started, I made sure to have the following:
+   ```
+   sudo cp -r build/* /var/www/html/
+   ```
 
-- A server running Ubuntu with Apache2 already installed. If you haven't set up Apache2 yet, you can refer to the previous section for instructions on how to install it.
-- A static React website that I wanted to deploy. If you haven't built your React website yet, you can follow the official React documentation to create a new project and build your website.
+4. Create a virtual host for the site.
 
-## Deploying a Static React Website with Apache2
+   ```
+   sudo nano /etc/apache2/sites-available/your-website.conf
+   ```
 
-To deploy my static React website using Apache2, I followed these steps:
+   ```apache
+   <VirtualHost *:80>
+       ServerName your-domain.com
+       DocumentRoot /var/www/html
+   </VirtualHost>
+   ```
 
-1. I built my React website by navigating to the root directory of my React project and running the following command:
+5. Enable the site and restart Apache.
 
-```
-npm run build
-```
+   ```
+   sudo a2ensite your-website.conf
+   sudo systemctl restart apache2
+   ```
 
-This command created an optimized production build of my React website in the \`build\` directory.
+The site is now served at the domain or IP in `ServerName`. From here it is the usual hardening: file permissions, a certificate from Let's Encrypt for HTTPS, and keeping Apache and the build up to date.
 
-2. Next, I copied the contents of the build directory to the default Apache document root directory by running the following command:
+## Part 3: Network storage with Samba
 
-```
-sudo cp -r build/* /var/www/html/
-```
+Samba is what turns the laptop into a NAS. One shared folder, visible to every device on the network.
 
-This command copied all the files and directories from the build directory to the default document root directory of Apache2.
+![Samba's smbd service running on the server](https://github.com/e-for-eshaan/home-server/assets/76566992/e9ca407a-f677-41bc-aa69-4b0f01104afd)
 
-3. I configured Apache2 to serve my React website by creating a virtual host file. To create a new virtual host file, I ran the following command:
+1. Install Samba.
 
-```
-sudo nano /etc/apache2/sites-available/your-website.conf
-```
+   ```
+   sudo apt install samba
+   ```
 
-Note: I replaced \`your-website.conf\` with a suitable name for my virtual host configuration file.
+2. Create the folder to share and add a share definition to the end of `/etc/samba/smb.conf`.
 
-4. In the virtual host file, I added the following configuration:
+   ```
+   mkdir -p ~/share
+   sudo nano /etc/samba/smb.conf
+   ```
 
+   ```ini
+   [share]
+       path = /home/<user>/share
+       browseable = yes
+       read only = no
+       valid users = <user>
+   ```
 
-```
-<VirtualHost *:80>
-ServerName your-domain.com
-DocumentRoot /var/www/html
-</VirtualHost>
-```
+3. Give the Linux user a Samba password and restart the service.
 
-I replaced \`your-domain.com\` with my actual domain name or server IP address.
+   ```
+   sudo smbpasswd -a <user>
+   sudo systemctl restart smbd
+   ```
 
-5. I saved the virtual host file and exited the editor.
+4. Mount it from any client: `\\<server-ip>\share` on Windows, `smb://<server-ip>/share` on macOS and Linux file managers.
 
-6. To enable the new virtual host configuration, I ran the following command:
+## What I learned
 
-```
-sudo a2ensite your-website.conf
-```
-
-7. Finally, I restarted Apache2 for the changes to take effect:
-```
-sudo systemctl restart apache2
-```
-
-8. Now, my React website was accessible through the domain name or IP address I specified in the virtual host configuration.
-
-## Conclusion
-
-I successfully set up Apache2 and deployed my static React website on my server. By following the steps outlined in this guide, I was able to showcase my React projects to visitors using a reliable and widely-used web server like Apache2.
-
-To ensure the security of my server and website, I configured appropriate permissions, SSL certificates, and other security measures. Additionally, I made sure to stay up to date with Apache2 and React updates to ensure compatibility and take advantage of new features.
-
-Overall, I am thrilled to share my website with the world and continue exploring the possibilities of web development with React and Apache2.
+- A laptop makes a surprisingly good server: silent, low power, and the battery is a free UPS.
+- Putting SSH on a different port keeps the auth log readable. It is not security on its own, but it filters out almost all of the automated noise.
+- Apache plus a static build is the simplest possible deploy. There is nothing to keep alive and nothing to crash.
 
 ## References
 
-Here are some resources I found helpful during my journey:
-
-- [Apache HTTP Server Documentation](https://httpd.apache.org/docs/) - Official documentation for Apache HTTP Server.
-- [Ubuntu Official Website](https://ubuntu.com/) - Official website of Ubuntu, where you can download the latest version and find documentation.
-- [OpenSSH Documentation](https
-EOF
+- [Apache HTTP Server documentation](https://httpd.apache.org/docs/)
+- [Ubuntu Server](https://ubuntu.com/server)
+- [OpenSSH documentation](https://www.openssh.com/manual.html)
+- [Samba documentation](https://www.samba.org/samba/docs/)
